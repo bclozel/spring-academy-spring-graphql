@@ -2,7 +2,10 @@ package io.spring.guides.graphqlmusic.support;
 
 import java.math.BigInteger;
 import java.time.Duration;
+import java.util.Locale;
 
+import graphql.GraphQLContext;
+import graphql.execution.CoercedVariables;
 import graphql.language.IntValue;
 import graphql.language.Value;
 import graphql.schema.Coercing;
@@ -22,7 +25,7 @@ public final class DurationSecondsScalar {
     static {
         Coercing<Duration, Long> coercing = new Coercing<Duration, Long>() {
             @Override
-            public Long serialize(Object input) throws CoercingSerializeException {
+            public Long serialize(Object input, GraphQLContext graphQLContext, Locale locale) throws CoercingSerializeException {
                 if (input instanceof Duration duration) {
                     return duration.toSeconds();
                 } else if (input instanceof String aString) {
@@ -35,7 +38,7 @@ public final class DurationSecondsScalar {
             }
 
             @Override
-            public Duration parseValue(Object input) throws CoercingParseValueException {
+            public Duration parseValue(Object input, GraphQLContext graphQLContext, Locale locale) throws CoercingParseValueException {
                 if (input instanceof Duration duration) {
                     return duration;
                 } else if (input instanceof String aString) {
@@ -48,7 +51,8 @@ public final class DurationSecondsScalar {
             }
 
             @Override
-            public Duration parseLiteral(Object input) throws CoercingParseLiteralException {
+            public Duration parseLiteral(Value<?> input, CoercedVariables coercedVariables,
+                                         GraphQLContext graphQLContext, Locale locale) throws CoercingParseLiteralException {
                 if (input instanceof IntValue intValue) {
                     return Duration.ofSeconds(intValue.getValue().longValue());
                 }
@@ -58,8 +62,8 @@ public final class DurationSecondsScalar {
             }
 
             @Override
-            public Value<?> valueToLiteral(Object input) {
-                Long aLong = serialize(input);
+            public IntValue valueToLiteral(Object input, GraphQLContext graphQLContext, Locale locale) {
+                Long aLong = serialize(input, graphQLContext, locale);
                 return IntValue.newIntValue(BigInteger.valueOf(aLong)).build();
             }
 
